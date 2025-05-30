@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { FlatList, StyleSheet, Touchable, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, Platform, StyleSheet, TextInput, Touchable, TouchableOpacity } from 'react-native';
 import hymnsData from '@/data/hymns.json';
 import { useThemeColor } from './Themed'; // Add this import
 
@@ -15,21 +15,40 @@ export default function HymnList({ path }: { path: string }) {
   const [hymns, setHymns] = React.useState<Hymn[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [search, setSearch] = useState('');
   const separatorColor = useThemeColor({}, 'text'); // Gets the current theme's text color
+  const searchBarBg = useThemeColor({ light: '#fff', dark: '#222' }, 'background');
+  const searchBarPlaceholderColor = useThemeColor({ light: '#888', dark: '#ccc' }, 'text')
 
-  // useeffect to fetch hymns data from hymns.json and parse it
   useEffect(() => {
-    const fetchHymns = async () => {
-      try {
-        setHymns(hymnsData);
-        setLoading(false);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'An unknown error occurred');
-        setLoading(false);
-      }
-    };
-    fetchHymns();
+    setHymns(hymnsData);
+    setLoading(false);
   }, []);
+
+  // Filter hymns based on search
+  const filteredHymns = hymns.filter(
+    hymn =>
+      hymn.name?.toLowerCase().includes(search.toLowerCase()) ||
+      hymn.id?.toString().includes(search)
+  )
+    .filter(
+      hymn => hymn.category !== 'Uncategorized' // Exclude hymns with 'Uncategorized' category
+    )
+    .filter(
+      hymn => hymn.category_id <= 62 // Exclude hymns with 'Uncategorized' category
+    );
+
+
+  const renderHymnItem = ({ item }: { item: Hymn }) => (
+    // <View style={styles.container}>
+    <TouchableOpacity onPress={() => { }}>
+      <Text style={styles.text} numberOfLines={1} ellipsizeMode='tail'>{item.id}. {item.name}</Text>
+      {/* <MonoText>{item.verses[0]}</MonoText> */}
+    </TouchableOpacity>
+    // </View>
+  );
+  const keyExtractor = (item: { id: number }) => item.id.toString();
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -44,32 +63,30 @@ export default function HymnList({ path }: { path: string }) {
       </View>
     );
   }
-  if (hymns.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>No hymns found.</Text>
-      </View>
-    );
-  }
-  const renderHymnItem = ({ item }: { item: Hymn }) => (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => {}}>
-        <Text style={styles.text} numberOfLines={1} ellipsizeMode='tail'>{item.id}. {item.name}</Text>
-        {/* <MonoText>{item.verses[0]}</MonoText> */}
-      </TouchableOpacity>
-    </View>
-  );
-  const keyExtractor = (item: { id: number }) => item.id.toString();
 
   return (
     <View style={styles.container}>
+      <View style={[styles.searchBarContainer, { backgroundColor: searchBarBg }]}>
+        <TextInput
+          placeholder="Search hymns..."
+          value={search}
+          onChangeText={setSearch}
+          style={[styles.searchBar, {color: searchBarPlaceholderColor}]}
+          autoCapitalize="none"
+          clearButtonMode={Platform.OS === 'ios' ? 'while-editing' : 'never'}
+          placeholderTextColor={searchBarPlaceholderColor}
+        />
+      </View>
       <FlatList
-        data={hymns}
+        data={filteredHymns}
         renderItem={renderHymnItem}
         keyExtractor={keyExtractor}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={<Text style={styles.text}>No hymns available.</Text>}
-        ItemSeparatorComponent={() => <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />}
+        ItemSeparatorComponent={() => (
+          <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+        )}
+        keyboardShouldPersistTaps="always"
       />
     </View>
   );
@@ -94,6 +111,17 @@ const styles = StyleSheet.create({
     // marginVertical: 30,
     height: 1,
     // width: '80%',
+  },
+  searchBarContainer: {
+    padding: 10,
+    // backgroundColor: '#fff',
+  },
+  searchBar: {
+    // backgroundColor: '#eee',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 36,
+    fontSize: 16,
   },
 
 });
