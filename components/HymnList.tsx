@@ -12,6 +12,7 @@ import { Hymn } from '@/types/hymn';
 
 import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { useRef } from 'react';
+import { router } from 'expo-router';
 
 export default function HymnList({ path }: { path: string }) {
 
@@ -64,9 +65,14 @@ export default function HymnList({ path }: { path: string }) {
       player?.pause();
     }
   }, [selectedAudio]);
+  
+
 
   const renderHymnItem = ({ item }: { item: Hymn }) => (
-    <TouchableOpacity onPress={() => playSound(item.id)}>
+    <TouchableOpacity onPress={() => 
+      // playSound(item.id)
+      router.push(`/hymn/${item.id}`) // Navigate to hymn detail page
+    }>
       <Text style={styles.text} numberOfLines={1} ellipsizeMode='tail'>{item.id}. {item.name}</Text>
       {/* <MonoText>{item.verses[0]}</MonoText> */}
     </TouchableOpacity>
