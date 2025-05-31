@@ -10,6 +10,9 @@ import { Text, View } from './Themed';
 import Colors from '@/constants/Colors';
 import { Hymn } from '@/types/hymn';
 
+import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { useRef } from 'react';
+
 export default function HymnList({ path }: { path: string }) {
 
   const [hymns, setHymns] = React.useState<Hymn[]>([]);
@@ -23,6 +26,9 @@ export default function HymnList({ path }: { path: string }) {
   useEffect(() => {
     setHymns(hymnsData);
     setLoading(false);
+    setAudioModeAsync({
+      playsInSilentMode: true,
+    })
   }, []);
 
   // Filter hymns based on search
@@ -38,14 +44,32 @@ export default function HymnList({ path }: { path: string }) {
       hymn => hymn.category_id <= 62 // Exclude hymns with 'Uncategorized' category
     );
 
+  const audioFiles: { [key: string]: any } = {
+    '1': require('@/assets/audio/001.mp3'),
+    // ...add all your hymn audio files here
+  };
+
+  const [selectedAudio, setSelectedAudio] = useState<any>(null);
+  const player = useAudioPlayer(selectedAudio);
+
+  const playSound = (hymnId: number) => {
+    const audioSource = audioFiles[hymnId.toString()];
+    setSelectedAudio(audioSource);
+  };
+
+  useEffect(() => {
+    if (selectedAudio && player) {
+      player.play();
+    } else {
+      player?.pause();
+    }
+  }, [selectedAudio]);
 
   const renderHymnItem = ({ item }: { item: Hymn }) => (
-    // <View style={styles.container}>
-    <TouchableOpacity onPress={() => { }}>
+    <TouchableOpacity onPress={() => playSound(item.id)}>
       <Text style={styles.text} numberOfLines={1} ellipsizeMode='tail'>{item.id}. {item.name}</Text>
       {/* <MonoText>{item.verses[0]}</MonoText> */}
     </TouchableOpacity>
-    // </View>
   );
   const keyExtractor = (item: { id: number }) => item.id.toString();
 
@@ -71,7 +95,7 @@ export default function HymnList({ path }: { path: string }) {
           placeholder="Search hymns..."
           value={search}
           onChangeText={setSearch}
-          style={[styles.searchBar, {color: searchBarPlaceholderColor}]}
+          style={[styles.searchBar, { color: searchBarPlaceholderColor }]}
           autoCapitalize="none"
           clearButtonMode={Platform.OS === 'ios' ? 'while-editing' : 'never'}
           placeholderTextColor={searchBarPlaceholderColor}
