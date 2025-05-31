@@ -1,17 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Platform, StyleSheet, TextInput, Touchable, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import hymnsData from '@/data/hymns.json';
 import { useThemeColor } from './Themed'; // Add this import
 
-import { ExternalLink } from './ExternalLink';
-import { MonoText } from './StyledText';
 import { Text, View } from './Themed';
 
-import Colors from '@/constants/Colors';
 import { Hymn } from '@/types/hymn';
 
-import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import { useRef } from 'react';
+import { setAudioModeAsync } from 'expo-audio';
 import { router } from 'expo-router';
 
 export default function HymnList({ path }: { path: string }) {
@@ -27,9 +23,6 @@ export default function HymnList({ path }: { path: string }) {
   useEffect(() => {
     setHymns(hymnsData);
     setLoading(false);
-    setAudioModeAsync({
-      playsInSilentMode: true,
-    })
   }, []);
 
   // Filter hymns based on search
@@ -45,31 +38,8 @@ export default function HymnList({ path }: { path: string }) {
       hymn => hymn.category_id <= 62 // Exclude hymns with 'Uncategorized' category
     );
 
-  const audioFiles: { [key: string]: any } = {
-    '1': require('@/assets/audio/001.mp3'),
-    // ...add all your hymn audio files here
-  };
-
-  const [selectedAudio, setSelectedAudio] = useState<any>(null);
-  const player = useAudioPlayer(selectedAudio);
-
-  const playSound = (hymnId: number) => {
-    const audioSource = audioFiles[hymnId.toString()];
-    setSelectedAudio(audioSource);
-  };
-
-  useEffect(() => {
-    if (selectedAudio && player) {
-      player.play();
-    } else {
-      player?.pause();
-    }
-  }, [selectedAudio]);
-  
-
-
   const renderHymnItem = ({ item }: { item: Hymn }) => (
-    <TouchableOpacity onPress={() => 
+    <TouchableOpacity onPress={() =>
       // playSound(item.id)
       router.push(`/hymn/${item.id}`) // Navigate to hymn detail page
     }>
