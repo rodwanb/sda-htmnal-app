@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { FlatList, Image, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import hymnsData from '@/data/hymns.json';
 import { useThemeColor } from './Themed'; // Add this import
 
@@ -16,7 +16,7 @@ export default function HymnList({ path }: { path: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const separatorColor = useThemeColor({}, 'text'); // Gets the current theme's text color
+  const textColor = useThemeColor({}, 'text'); // Gets the current theme's text color
   const searchBarBg = useThemeColor({ light: '#fff', dark: '#222' }, 'background');
   const searchBarPlaceholderColor = useThemeColor({ light: '#888', dark: '#ccc' }, 'text')
 
@@ -52,6 +52,7 @@ export default function HymnList({ path }: { path: string }) {
 
   const ListHeader = useMemo(() => (
     <>
+      <Image source={require('@/assets/images/adventist_logo.png')} style={{ width: 100, height: 100, alignSelf: 'center', tintColor: textColor }} />
       <Text style={styles.logoText}>Seventh-day{'\n'}Adventist Hymnal</Text>
       <View style={[styles.searchBarContainer]}>
         <TextInput
