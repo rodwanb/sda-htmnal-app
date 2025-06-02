@@ -8,6 +8,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { DarkTheme, LightTheme } from '@/constants/theme';
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -32,6 +33,7 @@ export default function TabLayout() {
           backgroundColor: colorScheme === 'dark' ? DarkTheme.colors.background : LightTheme.colors.background,
           borderTopColor: colorScheme === 'dark' ? DarkTheme.colors.border : LightTheme.colors.border,
         },
+        tabBarLabelStyle: { fontSize: RFPercentage(1.5), fontFamily: 'CrimsonTextRegular' },
       }}>
       <Tabs.Screen
         name="index"

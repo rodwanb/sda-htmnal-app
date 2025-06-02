@@ -67,7 +67,7 @@ export default function HymnList({ path }: { path: string }) {
         />
       </View>
     </>
-  ), [search]);
+  ), [search, searchBarBg, searchBarPlaceholderColor, textColor]);
 
   if (loading) {
     return (
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   logoText: {
+    fontFamily: 'CrimsonTextRegular',
     fontSize: RFPercentage(5.5),
     // fontWeight: 'bold',
     textAlign: 'center',
@@ -120,6 +121,7 @@ const styles = StyleSheet.create({
     // color: Colors.light.text,
   },
   text: {
+    fontFamily: 'CrimsonTextRegular',
     fontSize: RFPercentage(2.5),
     // lineHeight: 24,
     // color: Colors.light.text,
@@ -137,6 +139,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   searchBar: {
+    fontFamily: 'CrimsonTextRegular',
     // backgroundColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 10,
