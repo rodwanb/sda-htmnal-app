@@ -42,7 +42,6 @@ export default function HymnList({ path }: { path: string }) {
 
   const renderHymnItem = ({ item }: { item: Hymn }) => (
     <TouchableOpacity onPress={() =>
-      // playSound(item.id)
       router.push(`/hymn/${item.id}`) // Navigate to hymn detail page
     }>
       <Text style={styles.text} numberOfLines={1} ellipsizeMode='tail'>{item.id}. {item.name}</Text>
@@ -51,7 +50,7 @@ export default function HymnList({ path }: { path: string }) {
   );
   const keyExtractor = (item: { id: number }) => item.id.toString();
 
-  const ListHeader = useCallback(() => (
+  const ListHeader = useMemo(() => (
     <>
       <Text style={styles.logoText}>Seventh-day{'\n'}Adventist Hymnal</Text>
       <View style={[styles.searchBarContainer]}>
@@ -96,7 +95,7 @@ export default function HymnList({ path }: { path: string }) {
           ItemSeparatorComponent={() => (
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
           )}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
