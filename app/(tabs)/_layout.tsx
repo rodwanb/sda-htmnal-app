@@ -33,7 +33,7 @@ export default function TabLayout() {
           backgroundColor: colorScheme === 'dark' ? DarkTheme.colors.background : LightTheme.colors.background,
           borderTopColor: colorScheme === 'dark' ? DarkTheme.colors.border : LightTheme.colors.border,
         },
-        tabBarLabelStyle: { fontSize: RFPercentage(1.5), fontFamily: 'CrimsonTextRegular' },
+        // tabBarLabelStyle: { fontSize: RFPercentage(1.5) },
       }}>
       <Tabs.Screen
         name="index"

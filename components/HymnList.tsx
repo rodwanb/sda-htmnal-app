@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     // color: Colors.light.text,
   },
   text: {
-    fontFamily: 'CrimsonTextRegular',
+    // fontFamily: 'CrimsonTextRegular',
     fontSize: RFPercentage(2.5),
     // lineHeight: 24,
     // color: Colors.light.text,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   searchBar: {
-    fontFamily: 'CrimsonTextRegular',
+    // fontFamily: 'CrimsonTextRegular',
     // backgroundColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 10,
