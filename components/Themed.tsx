@@ -3,10 +3,8 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView } from 'react-native';
-
-import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
+import { Text as DefaultText, View as DefaultView, useColorScheme } from 'react-native';
+import { LightTheme, DarkTheme } from '@/constants/theme';
 
 type ThemeProps = {
   lightColor?: string;
@@ -18,16 +16,17 @@ export type ViewProps = ThemeProps & DefaultView['props'];
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark
+  colorName: keyof typeof LightTheme.colors & keyof typeof LightTheme.colors
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const colorScheme = useColorScheme() ?? 'light';
+  const colorFromProps = props[colorScheme];
 
   if (colorFromProps) {
     return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
   }
+
+  const theme = colorScheme === 'dark' ? DarkTheme : LightTheme;
+  return theme.colors[colorName];
 }
 
 export function Text(props: TextProps) {

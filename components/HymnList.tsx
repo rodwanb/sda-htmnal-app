@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import hymnsData from '@/data/hymns.json';
 import { useThemeColor } from './Themed'; // Add this import
 
@@ -7,14 +7,14 @@ import { Text, View } from './Themed';
 
 import { Hymn } from '@/types/hymn';
 
-import { setAudioModeAsync } from 'expo-audio';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HymnList({ path }: { path: string }) {
 
-  const [hymns, setHymns] = React.useState<Hymn[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [hymns, setHymns] = useState<Hymn[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const separatorColor = useThemeColor({}, 'text'); // Gets the current theme's text color
   const searchBarBg = useThemeColor({ light: '#fff', dark: '#222' }, 'background');
@@ -26,17 +26,19 @@ export default function HymnList({ path }: { path: string }) {
   }, []);
 
   // Filter hymns based on search
-  const filteredHymns = hymns.filter(
-    hymn =>
-      hymn.name?.toLowerCase().includes(search.toLowerCase()) ||
-      hymn.id?.toString().includes(search)
-  )
-    .filter(
-      hymn => hymn.category !== 'Uncategorized' // Exclude hymns with 'Uncategorized' category
+  const filteredHymns = useMemo(() => {
+    return hymns.filter(
+      hymn =>
+        hymn.name?.toLowerCase().includes(search.toLowerCase()) ||
+        hymn.id?.toString().includes(search)
     )
-    .filter(
-      hymn => hymn.category_id <= 62 // Exclude hymns with 'Uncategorized' category
-    );
+      .filter(
+        hymn => hymn.category !== 'Uncategorized' // Exclude hymns with 'Uncategorized' category
+      )
+      .filter(
+        hymn => hymn.category_id <= 62 // Exclude hymns with 'Uncategorized' category
+      );
+  }, [hymns, search]);
 
   const renderHymnItem = ({ item }: { item: Hymn }) => (
     <TouchableOpacity onPress={() =>
@@ -49,46 +51,55 @@ export default function HymnList({ path }: { path: string }) {
   );
   const keyExtractor = (item: { id: number }) => item.id.toString();
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Loading hymns...</Text>
-      </View>
-    );
-  }
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Error loading hymns: {error}</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-      <View style={[styles.searchBarContainer, { backgroundColor: searchBarBg }]}>
+  const ListHeader = useCallback(() => (
+    <>
+      <Text style={styles.logoText}>Seventh-day{'\n'}Adventist Hymnal</Text>
+      <View style={[styles.searchBarContainer]}>
         <TextInput
           placeholder="Search hymns..."
           value={search}
           onChangeText={setSearch}
-          style={[styles.searchBar, { color: searchBarPlaceholderColor }]}
+          style={[styles.searchBar, { backgroundColor: searchBarBg, color: searchBarPlaceholderColor }]}
           autoCapitalize="none"
           clearButtonMode={Platform.OS === 'ios' ? 'while-editing' : 'never'}
           placeholderTextColor={searchBarPlaceholderColor}
         />
       </View>
-      <FlatList
-        data={filteredHymns}
-        renderItem={renderHymnItem}
-        keyExtractor={keyExtractor}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        ListEmptyComponent={<Text style={styles.text}>No hymns available.</Text>}
-        ItemSeparatorComponent={() => (
-          <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        )}
-        keyboardShouldPersistTaps="always"
-      />
-    </View>
+    </>
+  ), [search]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.text}>Loading hymns...</Text>
+      </SafeAreaView>
+    );
+  }
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.text}>Error loading hymns: {error}</Text>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView edges={['top']} style={styles.container}>
+      <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
+        <FlatList
+          data={filteredHymns}
+          renderItem={renderHymnItem}
+          keyExtractor={keyExtractor}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          ListHeaderComponent={ListHeader}
+          ListEmptyComponent={<Text style={styles.text}>No hymns available.</Text>}
+          ItemSeparatorComponent={() => (
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+          )}
+          keyboardShouldPersistTaps="handled"
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -99,6 +110,13 @@ const styles = StyleSheet.create({
   codeHighlightContainer: {
     borderRadius: 3,
     paddingHorizontal: 4,
+  },
+  logoText: {
+    fontSize: 42,
+    // fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
+    // color: Colors.light.text,
   },
   text: {
     fontSize: 20,
@@ -114,14 +132,15 @@ const styles = StyleSheet.create({
   },
   searchBarContainer: {
     padding: 10,
-    // backgroundColor: '#fff',
+    // backgroundColor: 'transparent',
+    marginHorizontal: 10,
   },
   searchBar: {
     // backgroundColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 10,
-    height: 36,
-    fontSize: 16,
+    height: 46,
+    fontSize: 20,
   },
 
 });
