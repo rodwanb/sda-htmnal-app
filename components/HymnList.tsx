@@ -9,6 +9,7 @@ import { Hymn } from '@/types/hymn';
 
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 
 export default function HymnList({ path }: { path: string }) {
 
@@ -52,7 +53,7 @@ export default function HymnList({ path }: { path: string }) {
 
   const ListHeader = useMemo(() => (
     <>
-      <Image source={require('@/assets/images/adventist_logo.png')} style={{ width: 100, height: 100, alignSelf: 'center', tintColor: textColor }} />
+      <Image source={require('@/assets/images/adventist_logo.png')} style={{ width: 100, height: 100, alignSelf: 'center', tintColor: textColor, marginTop: 20 }} />
       <Text style={styles.logoText}>Seventh-day{'\n'}Adventist Hymnal</Text>
       <View style={[styles.searchBarContainer]}>
         <TextInput
@@ -112,15 +113,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   logoText: {
-    fontSize: 42,
+    fontSize: RFPercentage(5.5),
     // fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
     // color: Colors.light.text,
   },
   text: {
-    fontSize: 20,
-    lineHeight: 24,
+    fontSize: RFPercentage(2.5),
+    // lineHeight: 24,
     // color: Colors.light.text,
     marginHorizontal: 10,
     padding: 10,
@@ -139,8 +140,9 @@ const styles = StyleSheet.create({
     // backgroundColor: '#eee',
     borderRadius: 8,
     paddingHorizontal: 10,
-    height: 46,
-    fontSize: 20,
+    // height: 46,
+    paddingVertical: 10,
+    fontSize: RFPercentage(2),
   },
 
 });
